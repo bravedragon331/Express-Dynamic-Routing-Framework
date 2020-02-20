@@ -1,7 +1,7 @@
 # What is EDRF(Express Dynamic Routing Framework)?
 
 EDRF is an Application API Development Framework - a toolkit - for people who build web sites using Node.js.  
-Its goal is to enable you to develop projects much faster than you could if you were writing code from scratch, by providing
+Its goal is to help you to develop projects much faster than you could if you were writing code from scratch, by providing
 a rich set of routing and libraries for commonly needed tasks, as well as a simple interface and logical structure to access these libraries.  
 EDRF lets you creatively focus on your project by minimizing the amount of code needed for a given task.
 
