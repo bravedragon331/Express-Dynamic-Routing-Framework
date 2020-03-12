@@ -4,17 +4,34 @@ const smallFirstLetter = require("@lib/smallFirstLetter")
 
 function initApiRoute(app, directory, route) {
     let files = fs.readdirSync(directory);
-    if (files.includes("middleware.js")) {
-        let middleware = require("@" + directory + "/" + "middleware.js");
-        if (middleware.use) {
-            app.use(route, function (req, res, next) {
-                middleware.use(req, res, next, middleware);
-            })
+    files.sort((f1, f2) => {
+        var file1 = directory + '/' + f1;
+        var file2 = directory + '/' + f2;
+        if (fs.statSync(file1).isDirectory() && !fs.statSync(file2).isDirectory()) {
+            return -1
+        } else if (!fs.statSync(file1).isDirectory() && fs.statSync(file2).isDirectory()) {
+            return 1
+        } else if (f1 == "middleware.js" && !fs.statSync(file2).isDirectory()) {
+            return -1
+        } else if (f2 == "middleware.js" && !fs.statSync(file1).isDirectory()) {
+            return 1
         }
-    }
+        return 0
+    })
     files.forEach(function (file) {
         var newBase = directory + '/' + file;
-        if (!fs.statSync(newBase).isDirectory() && file != "middleware.js" && (file.slice(file.length - 4, file.length - 3) !== "_")) {
+        if (fs.statSync(newBase).isDirectory() && (file.slice(file.length - 1) === '_')) {
+            initApiRoute(app, newBase, route + '/:' + file.slice(0, file.length - 1));
+        } else if (fs.statSync(newBase).isDirectory()) {
+            initApiRoute(app, newBase, route + '/' + file);
+        } else if (file == "middleware.js") {
+            let middleware = require("@" + directory + "/" + "middleware.js");
+            if (middleware.use) {
+                app.use(route, function (req, res, next) {
+                    middleware.use(req, res, next, middleware);
+                })
+            }
+        } else if (!fs.statSync(newBase).isDirectory() && file != "middleware.js" && (file.slice(file.length - 4, file.length - 3) !== "_")) {
             let cRoute = route + '/' + file
             cRoute = cRoute.slice(0, cRoute.length - 3);
             let ctrl = require('@' + newBase);
@@ -77,10 +94,6 @@ function initApiRoute(app, directory, route) {
                     app.delete(cRoute + "/" + route, ctrl[key])
                 }
             });
-        } else if (fs.statSync(newBase).isDirectory() && (file.slice(file.length - 1) === '_')) {
-            initApiRoute(app, newBase, route + '/:' + file.slice(0, file.length - 1));
-        } else if (fs.statSync(newBase).isDirectory()) {
-            initApiRoute(app, newBase, route + '/' + file);
         }
     });
 }
