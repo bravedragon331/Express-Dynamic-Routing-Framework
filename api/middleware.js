@@ -1,4 +1,7 @@
-module.exports = function (req, res, next) {
-  console.log('book middleware')
-  next()
+class APIMiddleware extends Middleware {
+  constructor() {
+    super();
+  }
 }
+
+module.exports = new APIMiddleware();

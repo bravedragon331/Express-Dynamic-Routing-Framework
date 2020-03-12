@@ -5,7 +5,12 @@ const smallFirstLetter = require("@lib/smallFirstLetter")
 function initApiRoute(app, directory, route) {
     let files = fs.readdirSync(directory);
     if (files.includes("middleware.js")) {
-        app.use(route, require("@" + directory + "/" + "middleware.js"))
+        let middleware = require("@" + directory + "/" + "middleware.js");
+        if (middleware.use) {
+            app.use(route, function (req, res, next) {
+                middleware.use(req, res, next, middleware);
+            })
+        }
     }
     files.forEach(function (file) {
         var newBase = directory + '/' + file;
@@ -163,7 +168,12 @@ function initModelRoute(app) {
     });
 }
 
+function initSystem() {
+    global.Middleware = require('./middleware')
+}
+
 module.exports = function (app) {
+    initSystem();
     initApiRoute(app, 'api', '/api');
     initModelRoute(app)
 }
