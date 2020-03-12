@@ -48,7 +48,7 @@ class Middleware {
             console.log("Whitelist Middleware")
             next();
         } else if (self.isBlacklist(req.originalUrl)) {
-
+            res.status(404).send();
         } else if (process.env.AUTH_MODE == "jwt") {
             passport.authenticate('jwt', { session: false })(req, res, next)
         } else {

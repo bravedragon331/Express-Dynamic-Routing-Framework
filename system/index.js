@@ -169,7 +169,7 @@ function initModelRoute(app) {
 }
 
 function initSystem() {
-    global.Middleware = require('./middleware')
+    global.Middleware = require('@system/middleware')
 }
 
 module.exports = function (app) {
